@@ -15,13 +15,13 @@ NAME: **WRITE YOUR NAME HERE**
 --------
 **BASIC POINTS**:
 
-Here are the basic points to accomplish the project, what we are evaluating you is the knowledge in python, C++,  ros2 in a basic level of concepts and implementation, and also a speed and turn profile implementation. This part of the project is more for the understanding of itself because we invite you to make the extra-homework, which is the real challenge, where you'll have to be more creative and go further. 
+Here are the basic points to accomplish the project, what we are evaluating you is the knowledge in python, C++,  ROS2 in a basic level of concepts and implementation, and also a speed and turn profile implementation. This part of the project is more for the understanding of itself because we invite you to make the extra-homework, which is the real challenge, where you'll have to be more creative and go further. 
 
 Well, the recommendation in this section is to start with the python nodes or points and then go with the C++ ones. You won't have to change the input or output attributes in any function or method, just implement functions contents, and operations, import a library and use it inside. 
 
 Try first to understand the function of the node in the whole stack, then what is every function for, read the documentation and docs provided, and look for the TODO sections in these.
 
-if you follow the instruction to launch all the stack you'll get a window like this:
+If you follow the instruction to launch all the stack you'll get a window like this:
 
 <p align="center">
   <img height="300" src="https://user-images.githubusercontent.com/43115782/116264723-27a80380-a740-11eb-8e03-62039517b82a.png">
@@ -31,56 +31,60 @@ running the stack from the root, remember the command is:
 
         ada@vision1050:/workspace$ bash planner/configs/startPlanner.sh start
 
-if you can not get this window it could be that the code your are making is broken, you are having packages building errors, or having the xhost display error. But before starting to code you solution make sure that you have this window.
+If you can not get this window it could be that the code you are making is broken, you are having packages building errors, or having the xhost display error. But before starting to code you solution make sure that you have this window.
 
 ### *Python*
 
-if you complete python points you'll have the robot moving in the map without sound.
+If you complete python points you'll have the robot moving in the map without sound.
 
-1. **Implement/Create the path planner status subscriber** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/graphics/graphics/node_visual_gui.py) -> Implement/Create in the node constructor a subscriber for the bot status, the topic name should be `/path_planner/msg` message type `planner_msg`, callback `cb_path_planner`.
+1. **Implement/Create the path planner status subscriber** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/graphics/graphics/node_visual_gui.py) -> Implement/Create in the node constructor a subscriber for the bot status, the topic name should be `/path_planner/msg` message type `planner_msg`, callback `cb_path_planner`.
 
-2. **Implement/Create the Kiwibot status subscriber** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/graphics/graphics/node_visual_gui.py) -> Implement/Create in the node constructor a subscriber for the bot status, the topic name should be `/kiwibot/status` message type `kiwibot_msg`, callback `cb_kiwibot_status`.
+2. **Implement/Create the Kiwibot status subscriber** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/graphics/graphics/node_visual_gui.py) -> Implement/Create in the node constructor a subscriber for the bot status, the topic name should be `/kiwibot/status` message type `kiwibot_msg`, callback `cb_kiwibot_status`.
 
-3. **Drawing map descriptors** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/tree/main/planner/ros2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/tree/main/ros2/src/graphics/graphics/node_visual_gui.py) -> Implement the function `draw_descriptors` to draw every landmark in the map when a routine is loaded, please base on the red circles in the video example.**Note**: Do not add extra attributes o return.
+3. **Drawing map descriptors** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/tree/main/planner/ROS2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/tree/main/ROS2/src/graphics/graphics/node_visual_gui.py) -> Implement the function `draw_descriptors` to draw every landmark in the map when a routine is loaded, please base on the red circles in the video example.**Note**: Do not add extra attributes o return.
 
-4. **Draw the robot** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/tree/main/planner/ros2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/tree/main/planner/ros2/src/graphics/graphics/node_visual_gui.py) -> Implement the function `draw_robot` to draw the robot over the map, you can use the function `overlay_image` located in the utils module in the `python_utils.py` file.**Note**: Do not add extra attributes o return.
+4. **Draw the robot** - package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/tree/main/planner/ROS2/src/graphics), Node: [`node_visual_gui.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/tree/main/planner/ROS2/src/graphics/graphics/node_visual_gui.py) -> Implement the function `draw_robot` to draw the robot over the map, you can use the function `overlay_image` located in the utils module in the `python_utils.py` file.**Note**: Do not add extra attributes o return.
 
-5. **Implement/Trapezoidal speed profile**- package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/path_planner), Node: [`node_planner.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/path_planner/path_planner/node_planner.py) -> Implement the function `get_profile_route` to get a list of waypoints for a trapezoidal speed profile to get the points and the times where and when the robot should be. you can not add more input or output arguments to the function. you can follow the method and operations explained in this link: https://www.linearmotiontips.com/how-to-generate-motion-profile-for-linear-system/ . And read carefully the instructions and the documentation in the function.
+5. **Implement/Trapezoidal speed profile**- package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/path_planner), Node: [`node_planner.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/path_planner/path_planner/node_planner.py) -> Implement the function `get_profile_route` to get a list of waypoints for a trapezoidal speed profile to get the points and the times where and when the robot should be. you can not add more input or output arguments to the function. you can follow the method and operations explained in this link: https://www.linearmotiontips.com/how-to-generate-motion-profile-for-linear-system/ . And read carefully the instructions and the documentation in the function.
 
-6. **Implement/Trapezoidal turn profile**- package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/path_planner), Node: [`node_planner.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/path_planner/path_planner/node_planner.py) -> Implement the function `get_profile_turn` to get a list of waypoints for a trapezoidal turn profile to get the points and the times where and when the robot should be pointing. you can not add more input or output arguments to the function. you can follow the method and operations explained in this link: https://www.linearmotiontips.com/how-to-generate-motion-profile-for-linear-system/ . And read carefully the instructions and the documentation in the function.
+6. **Implement/Trapezoidal turn profile**- package: [`graphics`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/path_planner), Node: [`node_planner.py`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ROS2/src/path_planner/path_planner/node_planner.py) -> Implement the function `get_profile_turn` to get a list of waypoints for a trapezoidal turn profile to get the points and the times where and when the robot should be pointing. you can not add more input or output arguments to the function. you can follow the method and operations explained in this link: https://www.linearmotiontips.com/how-to-generate-motion-profile-for-linear-system/ . And read carefully the instructions and the documentation in the function.
 
 
 ### *C++* 
 
 First of all, you need to modify `planner/configs/startPlanner.sh` and `planner/configs/nodes_launch.yaml` files to build the Interfaces node. 
 
-        1. Look for the line:  
-        ```.bash
-        colcon build --symlink-install --packages-skip interfaces
-        ```
+  1. Look for the line:
 
-        2. Change it for:  
-        ```.bash
-        colcon build --symlink-install
-        ```
+  ```.bash
+  colcon build --symlink-install --packages-skip interfaces
+  ```
 
-        3. Identify the `NODE_INTERFACES` object: 
-        ```.yaml
-        NODE_INTERFACES:
-        launch: 0
-        node_executable: interfaces_node
-        output: screen
-        package: interfaces
-        ```
+  2. Change it for:  
+  
+  ```.bash
+  colcon build --symlink-install
+  ```
 
-        4. Change launch parameter: 
-        ```.yaml
-        NODE_INTERFACES:
-        launch: 1
-        node_executable: interfaces_node
-        output: screen
-        package: interfaces
-        ```
+  3. Identify the `NODE_INTERFACES` object: 
+
+  ```.yaml
+  NODE_INTERFACES:
+  launch: 0
+  node_executable: interfaces_node
+  output: screen
+  package: interfaces
+  ```
+
+  4. Change launch parameter: 
+  
+  ```.yaml
+  NODE_INTERFACES:
+  launch: 1
+  node_executable: interfaces_node
+  output: screen
+  package: interfaces
+  ```
 
 Don't worry this will fail, but that is part of the below exercises.
 
@@ -90,7 +94,7 @@ Don't worry this will fail, but that is part of the below exercises.
 
 3. **Publish a Bool message using the previous publisher created** - package: [`interfaces`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/interfaces) file to modify: `interfaces/src/modules/speaker.cpp` -> Use the documentation provided and your logic to discover how to publish a UniquePtr message in a simple publisher, which publish a True value each time a sound is ended and False each time a sound begin. Use the publisher called `m_done_pub`.
 
-4. **Create a condition when a file isn't found** - package: [`interfaces`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/interfaces) file to modify: `interfaces/src/modules/speaker.cpp` -> When a sound track isn't found, play the default sound called `track2` located in the same folder as the another ones. You could test this point using `ros2 topic pub -1 /device/speaker/command std_msgs/Int8 "data: 2"`.
+4. **Create a condition when a file isn't found** - package: [`interfaces`](https://github.com/kiwicampus/2D-Test-Track-Planner/tree/main/planner/ros2/src/interfaces) file to modify: `interfaces/src/modules/speaker.cpp` -> When a sound track isn't found, play the default sound called `track2` located in the same folder as the another ones. You could test this point using `ROS2 topic pub -1 /device/speaker/command std_msgs/Int8 "data: 2"`.
 
 
 If you finish successfully all the points, you must have a window like in this video: [solution of this amazing project](https://drive.google.com/file/d/19zo5GcFD73J9E9lJpVp6MlR2n9liaM2G/view?usp=sharing). Note: We had troubles capturing the audio, but if you listen carefully you can listen the audio effects.
@@ -120,7 +124,7 @@ If you finish successfully all the points, you must have a window like in this v
     * **[30%/5]** Pair programming Interview
     * **[40%/5]** Final Project
 10. We'll select the 3 best candidates by their grades, and we'll make the final decision with the Ai&Team and administration, also they will get a call from our COO & CEO/Confounder.
-11. We are evaluating your concepts and knowledge in ros2, Python, C++, Some basic control concepts, other Code stuff.
+11. We are evaluating your concepts and knowledge in ROS2, Python, C++, Some basic control concepts, other Code stuff.
 12. If no participant send the project before the dead line time, we will extend the deadline date and time, for everyone, with just person that complete the questionary and the basic-points the rest are doomed, but also if we considered that the solutions received are not enough or not well explained we also can extend the deadline, but we are pretty sure that this wont happened.
 
 ---
@@ -162,7 +166,7 @@ Next questions is after you finish the project, it doesn't give points but we re
 
 For extra homework we recommend you create a new branch from the developed one when you finish the basic points of the homework, you can name this new branch as *feature/extra_homework*, don't forget to push it before the time that it was given.
 
-1. **[+5%/5.0]**: Modify the docker file to source ros2 and have autocompleted commands like ```ros2 topic list```.
+1. **[+5%/5.0]**: Modify the docker file to source ROS2 and have autocompleted commands like ```ROS2 topic list```.
 2. **[+5%/5.0]**: Make a video recorder, in that way if you start a routine a video file of it should be created as `routine_id_date.mp4` you can not overwrite if the file or video exits (at least it's corrupted or incomplete because the process was interrupted)
 3. **[+10%/5.0]**: Implement a method or way to cancel routines and start another one, the could remain in the actual position or return to the origin, or to the closes landmark (with a key).
 4. **[+15%/5.0]**: Implement a method or way to stop/pause the routine and then continue (with a key).
