@@ -64,7 +64,7 @@ When the script finishes the building, and the compilation process you'll see th
      <img src="https://user-images.githubusercontent.com/43115782/114318886-99dbdf80-9ad4-11eb-947a-e7c6e417fec2.gif" alt="test_Track_map" width="400"/> 
 </p>
   
-You can press the keys-numbers to start a routine, to run a new one just close and reopen the program again, o just wait until the routine is finished.
+You can press the keys-numbers to start a routine, to run a new one just close and reopen the program again, or just wait until the routine is finished.
 
 *Note (Window is not displaying):* if you are having troubles or errors getting the user interface window, read about [Docker image with OpenCV with X11 forwarding for GUI](https://marcosnietoblog.wordpress.com/2017/04/30/docker-image-with-opencv-with-x11-forwarding-for-gui/) for explanations, and then run the  [``startXHost.sh``](planner/configs/startXHost.sh) script in the host terminal, or just run the prompt command (Do not this in the dev-container terminal):
  
@@ -85,7 +85,7 @@ the error is something like this:
 
 If the error remains, run the bash file until the window is shown, it could take even 10 times.
 
-*Note (Audio is not reproducing):* if you are having troubles getting audio from the virtual environment, please create a issue with the error description. But also check the audio device is not busy, or try connecting adn disconnecting headsets in the audio port.
+*Note (Audio is not reproducing):* if you are having troubles getting audio from the virtual environment, please create a issue with the error description. But also check the audio device is not busy, or try connecting and disconnecting headsets in the audio port.
 
 *Note (Launching specific nodes):* if you want to launch just a single node or some of them or the whole stack, go to the file ``nodes_launch.yaml`` and change the key *launch* for 1 to launch and 0 to don't launch. this could be useful when you are testing some nodes or just a single node.
 
