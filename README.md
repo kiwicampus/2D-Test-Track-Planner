@@ -1,7 +1,7 @@
 <!-- https://www.makeareadme.com/ -->
 
 <!-- ---------------------------------------------------------------------- -->
-# **2D Test Track Planner Simulator **(Final Project for Integration Engineer)**
+# **2D Test Track Planner Simulator** (Final Project for Integration Engineer)
 <!--
 Badges: On some READMEs, you may see small images that convey metadata, such
 as whether or not all the tests are passing for the project. You can use Shields
