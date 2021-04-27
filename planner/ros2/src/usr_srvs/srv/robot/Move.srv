@@ -1,0 +1,3 @@
+usr_msgs/Waypoint[] waypoints
+---
+bool completed

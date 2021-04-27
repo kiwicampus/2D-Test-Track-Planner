@@ -1,0 +1,20 @@
+NODE_KIWIBOT:
+  launch: 1
+  node_executable: kiwibot
+  output: screen
+  package: kiwibot
+NODE_PLANNER:
+  launch: 1
+  node_executable: path_planner
+  output: screen
+  package: path_planner
+NODE_GRAPHICS:
+  launch: 1
+  node_executable: graphics
+  output: screen
+  package: graphics
+NODE_INTERFACES:
+  launch: 0
+  node_executable: interfaces_node
+  output: screen
+  package: interfaces
