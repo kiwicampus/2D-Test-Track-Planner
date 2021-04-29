@@ -66,7 +66,7 @@ When the script finishes the building, and the compilation process you'll see th
   
 You can press the keys-numbers to start a routine, to run a new one just close and reopen the program again, or just wait until the routine is finished.
 
-*Note (Window is not displaying):* if you are having troubles or errors getting the user interface window, read about [Docker image with OpenCV with X11 forwarding for GUI](https://marcosnietoblog.wordpress.com/2017/04/30/docker-image-with-opencv-with-x11-forwarding-for-gui/) for explanations, and then run the  [``startXHost.sh``](planner/configs/startXHost.sh) script in the host terminal, or just run the prompt command (Do not this in the dev-container terminal):
+*Note (Window is not displaying):* if you are having troubles or errors getting the user interface window, read about [Docker image with OpenCV with X11 forwarding for GUI](https://marcosnietoblog.wordpress.com/2017/04/30/docker-image-with-opencv-with-x11-forwarding-for-gui/) for explanations, run the prompt command (Do not this in the dev-container terminal):
  
      $ xhost +
 
