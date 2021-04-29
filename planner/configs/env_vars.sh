@@ -1,4 +1,4 @@
-export DISPLAY=:0       # [int] display to show gui
+export DISPLAY=:1.0       # [int] display to show gui
 export DELETE_BUILD=0   # [int] delete ros2 build stuff
 
 export TURN_ACELERATION_FC=0.5      # [float] deceleration/acceleration factor in turn profile
