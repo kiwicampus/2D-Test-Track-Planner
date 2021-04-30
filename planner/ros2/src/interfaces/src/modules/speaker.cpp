@@ -26,13 +26,14 @@ Speaker::Speaker(rclcpp::NodeOptions &options) : Node("speaker", "interfaces", o
 
     // Subscribers
 
-   /********************************************
+    /********************************************
     * DEFINE YOUR AMAZING SUBSCRIBER 
     * Find Documentation here:
     * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-subscriber-node
    ********************************************/
+    m_speaker_sub = this->create_subscription<std_msgs::msg::Int8>("/device/speaker/command", default_qos, std::bind(&Speaker::speakerCb, this, _1));
 
-   /********************************************
+    /********************************************
     * END CODE 
    ********************************************/
 
@@ -135,7 +136,7 @@ void *Speaker::PlaySound()
     ********************************************/
     std_msgs::msg::Bool::UniquePtr msg(new std_msgs::msg::Bool());
 
-   /********************************************
+    /********************************************
     * END CODE 
    ********************************************/
 
@@ -152,7 +153,7 @@ void *Speaker::PlaySound()
     }
     m_multi_sound = 1;
 
-           /********************************************
+    /********************************************
     * PUBLISH YOUR AMAZING BOOL DATA
     * Take Care: in order to publish a Unique Pointer you need to pass std::move(msg) 
     * to the publish function. So you can't just pass the message inside the function, search for it :)
@@ -162,7 +163,7 @@ void *Speaker::PlaySound()
     // This is just for clean the variable name and re-initialize it.
     msg.reset(new std_msgs::msg::Bool());
     
-   /********************************************
+    /********************************************
     * END CODE 
    ********************************************/
 }
