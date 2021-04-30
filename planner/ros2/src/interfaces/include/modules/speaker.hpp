@@ -73,10 +73,7 @@ private:
     * USE THIS AMAZING SUBSCRIBER
     ********************************************/
     rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr m_speaker_sub;
-
-
-
-   /********************************************
+    /********************************************
     * END CODE 
    ********************************************/
 
@@ -86,7 +83,7 @@ private:
     /********************************************
     * DEFINE THIS AMAZING PUBLISHER
     ********************************************/
-
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_done_pub;
 
     /********************************************
     * END CODE 
