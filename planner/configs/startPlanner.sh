@@ -30,7 +30,7 @@ case "$1" in
         if [ ! "$2" == "no-build" ]; then
             . /opt/ros/foxy/setup.sh
             echo  "[INFO]: ROS2 Building new stuff ... "
-            colcon build --symlink-install --packages-skip interfaces
+            colcon build --symlink-install
             echo  "[INFO]: ROS2 Build successful ... "
         fi
         echo  "[INFO]: ROS2 sourcing ... "
