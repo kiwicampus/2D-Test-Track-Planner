@@ -81,21 +81,27 @@ class VisualsNode(Thread, Node):
         # Subscribers
 
         self.msg_planner = planner_msg()
+        self.msg_kiwibot = kiwibot_msg()
         # TODO: Implement the path planner status subscriber,
         # topic name: "/path_planner/msg"
         # message type: planner_msg
         # callback:cb_path_planner
-        # add here your solution
+
+        # Creates the subscriber for the Path Planner Status, Queue size = 10
         self.path_planner_status = self.create_subscription(
             planner_msg, "/path_planner/msg", self.cb_path_planner, 10
         )
+
         # ------------------------------------------
         # TODO: Implement the Kiwibot status subscriber,
         # topic name: "/kiwibot/status"
         # message type: kiwibot_msg
         # callback:cb_kiwibot_status
-        # add here your solution
-        self.msg_kiwibot = kiwibot_msg()
+
+        # Creates the subscriber for the Kiwibot Status, Queue size = 10
+        self.kiwibot_status = self.create_subscription(
+            kiwibot_msg, "/kiwibot/status", self.cb_kiwibot_status, 10
+        )
 
         # ------------------------------------------
 
