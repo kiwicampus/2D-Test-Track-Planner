@@ -16,7 +16,7 @@ import os
 
 from threading import Thread, Event
 
-# from std_msgs.msg import Int32
+from std_msgs.msg import Int32
 
 import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -27,9 +27,11 @@ from rclpy.node import Node
 
 from utils.python_utils import printlog
 from utils.python_utils import print_list_text
+from utils.python_utils import overlay_image
 
 from usr_msgs.msg import Planner as planner_msg
 from usr_msgs.msg import Kiwibot as kiwibot_msg
+
 
 # =============================================================================
 def setProcessName(name: str) -> None:
@@ -89,7 +91,11 @@ class VisualsNode(Thread, Node):
 
         # Creates the subscriber for the Path Planner Status, Queue size = 10
         self.path_planner_status = self.create_subscription(
-            planner_msg, "/path_planner/msg", self.cb_path_planner, 10
+            msg_type=planner_msg,
+            topic="/path_planner/msg",
+            callback=self.cb_path_planner,
+            qos_profile=qos_profile_sensor_data,
+            callback_group=self.callback_group,
         )
 
         # ------------------------------------------
@@ -100,7 +106,11 @@ class VisualsNode(Thread, Node):
 
         # Creates the subscriber for the Kiwibot Status, Queue size = 10
         self.kiwibot_status = self.create_subscription(
-            kiwibot_msg, "/kiwibot/status", self.cb_kiwibot_status, 10
+            msg_type=kiwibot_msg,
+            topic="/kiwibot/status",
+            callback=self.cb_kiwibot_status,
+            qos_profile=qos_profile_sensor_data,
+            callback_group=self.callback_group,
         )
 
         # ------------------------------------------
@@ -114,13 +124,13 @@ class VisualsNode(Thread, Node):
 
         # Uncomment
         # Publisher for activating the rear cam streaming
-        # self.msg_path_number = Int32()
-        # self.pub_start_routine = self.create_publisher(
-        #     msg_type=Int32,
-        #     topic="/graphics/start_routine",
-        #     qos_profile=1,
-        #     callback_group=self.callback_group,
-        # )
+        self.msg_path_number = Int32()
+        self.pub_start_routine = self.create_publisher(
+            msg_type=Int32,
+            topic="/graphics/start_routine",
+            qos_profile=1,
+            callback_group=self.callback_group,
+        )
 
         # ---------------------------------------------------------------------
         self.damon = True
@@ -145,6 +155,11 @@ class VisualsNode(Thread, Node):
         """
 
         try:
+
+            printlog(
+                msg="Drawing Landmarks",
+                msg_type="INFO",
+            )
             self.msg_planner = msg
 
             # Read again background image to update visuals and components
@@ -331,11 +346,15 @@ class VisualsNode(Thread, Node):
         Returns:
             _: Image with robot drawn
         """
-
         # -----------------------------------------
         # Insert you solution here
 
-        return l_img  # remove this line when implement your solution
+        # I moved the image of the kiwibot manually to center it and then noticed the arg src_center.
+        # Sad Face :c
+        map_with_kiwibot = overlay_image(
+            l_img, s_img, pos, transparency, src_center=True
+        )
+        return map_with_kiwibot
 
         # -----------------------------------------
 
@@ -354,10 +373,10 @@ class VisualsNode(Thread, Node):
         win_img, robot_coord = self.crop_map(coord=coord)
 
         # Draws robot in maps image
-        # if coord[0] and coord[1]:
-        # win_img = self.draw_robot(
-        #     l_img=win_img, s_img=self._kiwibot_img, pos=robot_coord
-        # )
+        if coord[0] and coord[1]:
+            win_img = self.draw_robot(
+                l_img=win_img, s_img=self._kiwibot_img, pos=robot_coord
+            )
 
         # Draw descriptions
         str_list = [
@@ -415,11 +434,13 @@ class VisualsNode(Thread, Node):
         Returns:
             img_src: `cv2.math` map image with keypoints drawn
         """
-
         # -----------------------------------------
         # Insert you solution here
-        pass
-
+        radius = 12  # Radius of the circle
+        color = (0, 0, 255)  # Color of the circle in BGR
+        thickness = 2  # Thickness of the line. Use -1 to fill the circle
+        for i in land_marks:
+            cv2.circle(self._win_background, (i.x, i.y), radius, color, thickness)
         # -----------------------------------------
 
     def run(self) -> None:
@@ -464,7 +485,7 @@ class VisualsNode(Thread, Node):
                         msg=f"Code is broken here",
                         msg_type="WARN",
                     )
-                    continue  # remove this line
+                    # continue  # remove this line
                     printlog(
                         msg=f"Routine {chr(key)} was sent to path planner node",
                         msg_type="INFO",
