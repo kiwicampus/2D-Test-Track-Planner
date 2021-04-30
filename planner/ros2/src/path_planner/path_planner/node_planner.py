@@ -472,11 +472,6 @@ class PlannerNode(Node):
                 }
         """
 
-        printlog(
-            msg="src={} dst= {} time={} pt= {} n= {}".format(src, dst, time, pt, n),
-            msg_type="INFO",
-        )
-
         way_points = []
 
         # ---------------------------------------------------------------------
@@ -558,11 +553,6 @@ class PlannerNode(Node):
                     "dt": [float](sept of time for angle a, is constant element)
                 }
         """
-
-        printlog(
-            msg="dts = {} time = {} pt={} n = {}".format(dst, time, pt, n),
-            msg_type="INFO",
-        )
 
         turn_points = []
         if dst == 0.0:
