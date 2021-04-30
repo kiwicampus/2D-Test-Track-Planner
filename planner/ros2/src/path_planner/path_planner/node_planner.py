@@ -9,6 +9,7 @@ Code Information:
 
 # =============================================================================
 import numpy as np
+import math
 import yaml
 import csv
 import sys
@@ -89,11 +90,15 @@ class PlannerNode(Node):
         # ---------------------------------------------------------------------
         # Environment variables for forware and turn profiles
         self._TURN_ACELERATION_FC = float(os.getenv("TURN_ACELERATION_FC", default=0.3))
-        self._TURN_CRTL_POINTS = float(os.getenv("TURN_CRTL_POINTS", default=30))
+        self._TURN_CRTL_POINTS = int(
+            os.getenv("TURN_CRTL_POINTS", default=30)
+        )  # Was Float before
         self._FORWARE_ACELERATION_FC = float(
             os.getenv("FORWARE_ACELERATION_FC", default=0.3)
         )
-        self._FORWARE_CRTL_POINTS = float(os.getenv("FORWARE_CRTL_POINTS", default=30))
+        self._FORWARE_CRTL_POINTS = int(
+            os.getenv("FORWARE_CRTL_POINTS", default=30)
+        )  # Was Float before
         self._TURN_TIME = float(os.getenv("TURN_TIME", default=3.0))
 
         # ---------------------------------------------------------------------
@@ -467,11 +472,16 @@ class PlannerNode(Node):
                 }
         """
 
+        printlog(
+            msg="src={} dst= {} time={} pt= {} n= {}".format(src, dst, time, pt, n),
+            msg_type="INFO",
+        )
+
         way_points = []
 
         # ---------------------------------------------------------------------
         # TODO: Trapezoidal speed profile
-        # Add your solution here, remeber that every element in the list is a dictionary
+        # Add your solution here, remember that every element in the list is a dictionary
         # where every element in has the next structure and data type:
         # "idx": [int](index of the waypoint),
         # "pt": [tuple][int](x and y axis positions in the image space),
@@ -480,6 +490,53 @@ class PlannerNode(Node):
         # Do not forget and respect the keys names
 
         # ---------------------------------------------------------------------
+
+        d = math.sqrt(
+            ((dst[0] - src[0]) ** 2 + (dst[1] - src[1]) ** 2)
+        )  # Distance between src and dst
+
+        theta = math.atan2(
+            (dst[1] - src[1]), (dst[0] - src[0])
+        )  # Angle between src and dst
+
+        t_a = time * pt  # Amount of time for acceleration/deceleration phase
+        t_c = time - 2 * t_a  # Amount of time for constant velocity
+        v_max = d / (t_a + t_c)  # Max velocity of the trajectory
+
+        dt = time / n  # Delta of time for the discrete trajectory
+        d_a = 0  # Distance Traveled in acceleration
+        d_c = 0  # Distance Traveled at max velocity
+        d_d = 0  # Distance Traveled in deceleration
+
+        for i in range(n):
+
+            idx = i + 1
+            t = dt * idx
+            if t <= t_a:  # For accelerating
+                b = t  # Base of the triangle
+                h = v_max * t / t_a  # Height of the triangle
+                d_t = b * h / 2  # Distance traveled (Area below the curve)
+
+            elif t > t_a and t <= (t_a + t_c):  # For max velocity
+                b = t - t_a  # Base of the rectangle
+                h = v_max  # Height of the rectangle
+                d_t = (
+                    b * h + v_max * t_a / 2
+                )  # Distance traveled (Area below the curve)
+
+            else:  # For decelerating
+                b = t - (t_a + t_c)  # Base of the rectangle
+                h1 = v_max * (1 - b / t_a)  # Height of smaller side of the trapezoid
+                h2 = v_max  # Height of bigger side of the trapezoid
+                d_t = (
+                    ((h1 + h2) * b / 2) + (v_max * t_a / 2) + (v_max * t_c)
+                )  # Distance traveled (Area below the curve)
+
+            x = int(math.cos(theta) * d_t) + src[0]
+            y = int(math.sin(theta) * d_t) + src[1]
+
+            wp = {"idx": idx, "pt": (x, y), "t": t, "dt": dt}
+            way_points.append(wp)
 
         return way_points
 
@@ -502,6 +559,11 @@ class PlannerNode(Node):
                 }
         """
 
+        printlog(
+            msg="dts = {} time = {} pt={} n = {}".format(dst, time, pt, n),
+            msg_type="INFO",
+        )
+
         turn_points = []
         if dst == 0.0:
             return turn_points
@@ -517,6 +579,41 @@ class PlannerNode(Node):
         # Do not forget and respect the keys names
 
         # ---------------------------------------------------------------------
+
+        t_a = time * pt  # Amount of time for acceleration/deceleration phase
+        t_c = time - 2 * t_a  # Amount of time for constant velocity
+        w_max = dst / (t_a + t_c)  # Max velocity of the trajectory
+
+        dt = time / n  # Delta of time for the discrete trajectory
+
+        d_a = 0  # Degrees Traveled in acceleration
+        d_c = 0  # Degrees Traveled at max velocity
+        d_d = 0  # Degrees Traveled in deceleration
+
+        for i in range(n):
+            idx = i + 1
+            t = dt * idx
+            if t <= t_a:  # For accelerating
+                b = t  # Base of the triangle
+                h = w_max * t / t_a  # Height of the triangle
+                d_a = b * h / 2  # Distance traveled (Area below the curve)
+
+            elif t > t_a and t <= (t_a + t_c):  # For max velocity
+                b = t - t_a  # Base of the rectangle
+                h = w_max  # Height of the rectangle
+                d_c = b * h  # Distance traveled (Area below the curve)
+
+            else:  # For decelerating
+                b = t - (t_a + t_c)  # Base of the rectangle
+                h1 = w_max * (1 - b / t_a)  # Height of smaller side of the trapezoid
+                h2 = w_max  # Height of bigger side of the trapezoid
+                d_d = (h1 + h2) * b / 2  # Distance traveled (Area below the curve)
+
+            d_t = d_a + d_c + d_d  # Total degrees turned
+
+            wp = {"idx": idx, "a": d_t, "t": t, "dt": dt}
+            turn_points.append(wp)
+
         return turn_points
 
 
