@@ -137,18 +137,32 @@ Respond below every questions:
 
 2. [Python] what is `ReentrantCallbackGroup()` in the python nodes with you own words, give an common life example, and what happen if is not used?
 
+    This function allows a callback to be called at the same time as other callbacks in a node, in other words, it allows to execute several actions at the same time. This is very effective when you need to do more than one thing at the same time, for example: You want to cook something and you would like to stir the sauce and chop the vegetables at the same time.
+
 3. [Python] are Python packages compiled as C++ packages?
+
+    
 
 4. [Python] Why with some code errors in some nodes the logs are not printed?
 
+    Those errors are not handled/printed with the printlogger() function.
+
 5. [Control] What other turn or speed profile would you implement, why, and what are the benefits?
 
+    One clear option would be implement a triangular speer profile, that way the time needed to move from a landmark to another is less compared to the trapezoidal. However, we have to think in the implementation on the real kiwibot and not on a simulation, the speed profile can be achieved by using a reference for the speed and a feedback loop with the actual velocity. Based on the last, I would implement a controller for the speed/turn profile where the error would be the distance left from my position to the next landmark. For the controller I would use a PI where the proportional constant would have some notions of adaptive control, in other words, the proportional constant would change as the robot approaches the target. Something like Kp = K + e^(-rho). Where K is the base constant for the proportional controller and rho the distance left to arrive the landmark.
+
 6. [C++] What is the mean of the number "15" used in the pthread_kill inside the destructor method?
-    The number 15 used on the function represents de ID of the thread we want to terminate.
+
+    The number 15 used on the function represents de ID of the thread we want to terminate. So in this case the function would terminate the thread with the ID 15.
 
 7. [C++] Why are we using UniquePointer instead of SharedPointers to publish a ROS2 message?
 
+    We are using a UniquePointer to publish a message to optimize memory allocation. Using a UniquePointer we can have a value with only one pointer, this then is moved to another pointer to publish the message (that is why we have to use std::move(msg) to publish a message). When the message is published the new UniquePointer will be destroyed and the initial UniquePointer will reclaim the value of the message published. If we were to use a SharedPointer for the same purpose, each time we would publish a message a new pointer would be created, therefore the memory used to publish a message would increment each time a message is published.
+
 8. [C++] Why are we using a m_multi_sound variable? Explain ...
+
+    The m_multi_sound variable allows to play more than one track a the time. This value is binary, for 0 the background track would not play during a routine, and for 1 the audio will reproduce during a routine along with the audios of arriving to a waypoint and finishing the routine.
+
 
 9. [C++] Why are we freeing the memory allocated by raw pointer "buff" variable and not freeing the memory allocated by the Shared and Unique Pointers? (HARD)
 
@@ -156,7 +170,7 @@ Respond below every questions:
 
 10. [Docker] Explain with your own words what is the instructions `apt-get autoremove && apt-get clean -y` for?
 
-    
+    This command would delete all the unused packages and cache files from any installation made. The options -y is to automatically accept the process when asked.
 
 11. [Docker] If you modify a layer what happen with the previous and the next ones?
 

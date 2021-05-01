@@ -119,7 +119,7 @@ void Speaker::speakerCb(const std_msgs::msg::Int8::SharedPtr msg)
     {
         RCLCPP_DEBUG(this->get_logger(), "Sound stopped");
         m_pause = 1;
-        m_multi_sound = 1;
+        m_multi_sound = 1; /*Change to 0 maybe */
     }
 }
 
@@ -139,7 +139,6 @@ void *Speaker::PlaySound()
     * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-publisher-node
     ********************************************/
     std_msgs::msg::Bool::UniquePtr msg(new std_msgs::msg::Bool());
-    msg->data = 0;
     m_done_pub->publish(std::move(msg));
 
     /********************************************
