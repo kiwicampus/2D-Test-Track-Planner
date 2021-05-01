@@ -185,6 +185,10 @@ Respond below every questions:
 Next questions is after you finish the project, it doesn't give points but we really appreciate you feedback:
 * What do you think about this project? is it hard or enough? is it to complicated, is it well structure, explanations and instructions are clear?
 
+    The project so far have been really fun and with a low-medium difficulty. I would say that understanding the code of other person is always hard to come by, but that's part of the job. I would have liked to be more tested on my problem solving abilities by having a problem to solve from zero, nonetheless I think that will be the final part of the project and so far I'm happy with all the things I have learned.
+    
+    *Now for the last part, I'm going to need to work [...](https://www.youtube.com/watch?v=gAjR4_CbPpQ)*
+
 ---
 <!-- ---------------------------------------------------------------------- -->
 ## **EXTRA-HOMEWORK**
