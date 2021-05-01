@@ -482,7 +482,7 @@ class VisualsNode(Thread, Node):
                 # Key1=1048633 & Key9=1048625
                 elif key >= 48 and key <= 57:
                     printlog(
-                        msg=f"Code is broken here",
+                        msg=f"Code is no longer broken here",
                         msg_type="WARN",
                     )
                     # continue  # remove this line

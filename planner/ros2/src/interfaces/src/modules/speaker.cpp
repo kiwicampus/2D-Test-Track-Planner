@@ -26,15 +26,16 @@ Speaker::Speaker(rclcpp::NodeOptions &options) : Node("speaker", "interfaces", o
 
     // Subscribers
 
-   /********************************************
+    /********************************************
     * DEFINE YOUR AMAZING SUBSCRIBER 
     * Find Documentation here:
     * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-subscriber-node
    ********************************************/
+    m_speaker_sub = this->create_subscription<std_msgs::msg::Int8>("/device/speaker/command", default_qos, std::bind(&Speaker::speakerCb, this, _1));
 
-   /********************************************
+    /********************************************
     * END CODE 
-   ********************************************/
+    ********************************************/
 
     /* Open the PCM device in playback mode */
     if (pcm = (snd_pcm_open(&pcm_handle, m_sound_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0) < 0))
@@ -104,7 +105,11 @@ void Speaker::speakerCb(const std_msgs::msg::Int8::SharedPtr msg)
         /********************************************
         * PLAY A DEFAULT SOUND IF NOT FOUND THE TRACK FILE
         ********************************************/
-        
+        else 
+        {
+            readfd = open((m_path + "track2.wav").c_str(), O_RDONLY);
+            status = pthread_create(&pthread_id, NULL, (THREADFUNCPTR)&Speaker::PlaySound, this);
+        }
         /********************************************
         * END CODE 
         ********************************************/
@@ -134,8 +139,10 @@ void *Speaker::PlaySound()
     * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-publisher-node
     ********************************************/
     std_msgs::msg::Bool::UniquePtr msg(new std_msgs::msg::Bool());
+    msg->data = 0;
+    m_done_pub->publish(std::move(msg));
 
-   /********************************************
+    /********************************************
     * END CODE 
    ********************************************/
 
@@ -152,7 +159,7 @@ void *Speaker::PlaySound()
     }
     m_multi_sound = 1;
 
-           /********************************************
+    /********************************************
     * PUBLISH YOUR AMAZING BOOL DATA
     * Take Care: in order to publish a Unique Pointer you need to pass std::move(msg) 
     * to the publish function. So you can't just pass the message inside the function, search for it :)
@@ -162,7 +169,7 @@ void *Speaker::PlaySound()
     // This is just for clean the variable name and re-initialize it.
     msg.reset(new std_msgs::msg::Bool());
     
-   /********************************************
+    /********************************************
     * END CODE 
    ********************************************/
 }

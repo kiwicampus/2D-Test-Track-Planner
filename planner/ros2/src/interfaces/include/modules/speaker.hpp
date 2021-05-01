@@ -49,7 +49,7 @@ public:
     /*!
         CallBack trigger by the subscriber
         @param _msg std_msgs::msg::Int8::SharedPtr Message to with data to choose
-       the track-sound to play
+        the track-sound to play
     */
     void speakerCb(const std_msgs::msg::Int8::SharedPtr _msg);
 
@@ -73,10 +73,7 @@ private:
     * USE THIS AMAZING SUBSCRIBER
     ********************************************/
     rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr m_speaker_sub;
-
-
-
-   /********************************************
+    /********************************************
     * END CODE 
    ********************************************/
 
@@ -86,11 +83,12 @@ private:
     /********************************************
     * DEFINE THIS AMAZING PUBLISHER
     ********************************************/
-
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_done_pub;
 
     /********************************************
     * END CODE 
     ********************************************/
+
     /*!
         Attributes
     */
