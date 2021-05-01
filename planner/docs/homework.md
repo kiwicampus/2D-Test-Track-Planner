@@ -135,13 +135,15 @@ Respond below every questions:
 
 1. [Python] Why the robot's image gets distorted when is turning?
 
+    Each time the robot is turning we do a rotational transformation. During this transformation, we have to make an interpolation so that each pixel is rotated, in other words, we are estimating where the pixels will be and painting that pixel of it's corresponding color. Due to the interpolation action, there is some information lost so the image gets distorted each time it turns (and it turns a lot). One way to "solve" the problem is to use an interpolation method uses a bigger pixel window. However, the image will always get distorted while turning because it doesn't matter which interpolation we use, there will always be a loss of information.  
+
 2. [Python] what is `ReentrantCallbackGroup()` in the python nodes with you own words, give an common life example, and what happen if is not used?
 
     This function allows a callback to be called at the same time as other callbacks in a node, in other words, it allows to execute several actions at the same time. This is very effective when you need to do more than one thing at the same time, for example: You want to cook something and you would like to stir the sauce and chop the vegetables at the same time.
 
 3. [Python] are Python packages compiled as C++ packages?
 
-    
+    No, Python packages are compiled in native binary languages. This packages might be compiled by the same language such as C, but in the end, python packages are not interpreted as C++ packages and then compiled.
 
 4. [Python] Why with some code errors in some nodes the logs are not printed?
 
