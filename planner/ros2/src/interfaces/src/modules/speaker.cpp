@@ -35,7 +35,7 @@ Speaker::Speaker(rclcpp::NodeOptions &options) : Node("speaker", "interfaces", o
 
     /********************************************
     * END CODE 
-   ********************************************/
+    ********************************************/
 
     /* Open the PCM device in playback mode */
     if (pcm = (snd_pcm_open(&pcm_handle, m_sound_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0) < 0))
@@ -105,7 +105,11 @@ void Speaker::speakerCb(const std_msgs::msg::Int8::SharedPtr msg)
         /********************************************
         * PLAY A DEFAULT SOUND IF NOT FOUND THE TRACK FILE
         ********************************************/
-        
+        else 
+        {
+            readfd = open((m_path + "track2.wav").c_str(), O_RDONLY);
+            status = pthread_create(&pthread_id, NULL, (THREADFUNCPTR)&Speaker::PlaySound, this);
+        }
         /********************************************
         * END CODE 
         ********************************************/
@@ -135,6 +139,11 @@ void *Speaker::PlaySound()
     * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-publisher-node
     ********************************************/
     std_msgs::msg::Bool::UniquePtr msg(new std_msgs::msg::Bool());
+
+    auto message = std_msgs::msg::String();
+    message.data = "Hello, world! " + std::to_string(count_++);
+    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+    publisher_->publish(message);
 
     /********************************************
     * END CODE 

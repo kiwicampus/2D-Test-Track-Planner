@@ -49,7 +49,7 @@ public:
     /*!
         CallBack trigger by the subscriber
         @param _msg std_msgs::msg::Int8::SharedPtr Message to with data to choose
-       the track-sound to play
+        the track-sound to play
     */
     void speakerCb(const std_msgs::msg::Int8::SharedPtr _msg);
 
@@ -88,6 +88,7 @@ private:
     /********************************************
     * END CODE 
     ********************************************/
+
     /*!
         Attributes
     */
