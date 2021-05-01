@@ -144,6 +144,7 @@ Respond below every questions:
 5. [Control] What other turn or speed profile would you implement, why, and what are the benefits?
 
 6. [C++] What is the mean of the number "15" used in the pthread_kill inside the destructor method?
+    The number 15 used on the function represents de ID of the thread we want to terminate.
 
 7. [C++] Why are we using UniquePointer instead of SharedPointers to publish a ROS2 message?
 
@@ -151,11 +152,19 @@ Respond below every questions:
 
 9. [C++] Why are we freeing the memory allocated by raw pointer "buff" variable and not freeing the memory allocated by the Shared and Unique Pointers? (HARD)
 
-10. [Docker] Explain with your own words what is the instructions `apt-get autoremove && apt-get clean -y for?`
+    For a raw pointer, memory space is allocated and not released automatically. On the other hand, memory for shared and unique pointers are allocated and freed automatically. In this way, the memory assigned to the Shared and Unique pointers is freed automatically, in this way it is not necessary to manually free that memory; as opposed to the case of a raw pointer.
+
+10. [Docker] Explain with your own words what is the instructions `apt-get autoremove && apt-get clean -y` for?
+
+    
 
 11. [Docker] If you modify a layer what happen with the previous and the next ones?
 
+    The layers are built one on top of the previous one and are read only. If we modify a layer, this layer would be built on top of the previous one and the next ones would be built on top of the modified layer. This would mean the image would have to be rebuild.
+
 12. [Docker] Can we change the basic image (`FROM ubuntu:20.04`) from the docker file to another?
+
+    Yes, we can change the basic image on a docker file. Nonetheless, the image would have to be rebuild since basically we are changing the operating system. In my experience this kind of actions needs to be analyzed, specially depending on the architecture you are building, some libraries may not work. 
 
 Next questions is after you finish the project, it doesn't give points but we really appreciate you feedback:
 * What do you think about this project? is it hard or enough? is it to complicated, is it well structure, explanations and instructions are clear?
