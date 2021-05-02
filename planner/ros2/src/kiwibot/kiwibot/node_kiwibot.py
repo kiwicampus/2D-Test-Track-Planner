@@ -25,6 +25,7 @@ from usr_srvs.srv import Move
 from usr_srvs.srv import Turn
 
 from std_msgs.msg import Int8
+from std_msgs.msg import Bool
 
 from usr_msgs.msg import Kiwibot as kiwibot_status
 
@@ -81,7 +82,8 @@ class KiwibotNode(Node):
             float32 yaw     # time since robot is moving
             bool moving     # Robot is moving
         """
-
+        # ---------------------------------------------------------------------
+        self.routine_status = False
         # ---------------------------------------------------------------------
         # Publishers
         self.pub_bot_status = self.create_publisher(
@@ -99,8 +101,18 @@ class KiwibotNode(Node):
         )
 
         # ---------------------------------------------------------------------
-        # Services
 
+        # Subscribers
+        self.sub_routine_status = self.create_subscription(
+            msg_type=Bool,
+            topic="/path_planner/routine_status",
+            callback=self.cb_routine_status,
+            qos_profile=qos_profile_sensor_data,
+            callback_group=self.callback_group,
+        )
+
+        # ---------------------------------------------------------------------
+        # Services
         # service to turn the robot
         self.srv_robot_turn = self.create_service(
             Turn,
@@ -117,6 +129,9 @@ class KiwibotNode(Node):
             callback_group=self.callback_group,
         )
 
+    def cb_routine_status(self, msg: Bool):
+        self.routine_status = msg.data
+
     def cb_srv_robot_turn(self, request, response) -> Turn:
         """
             Callback to update kiwibot state information when turning
@@ -132,6 +147,9 @@ class KiwibotNode(Node):
         try:
 
             for idx, turn_ref in enumerate(request.turn_ref[:-1]):
+
+                while self.routine_status:
+                    pass
 
                 if self._TURN_PRINT_WAYPOINT:
                     printlog(msg=turn_ref, msg_type="INFO")
@@ -176,9 +194,11 @@ class KiwibotNode(Node):
             response: `usr_srvs.srv._move.Move_Response` Moving request
             successfully completed or not
         """
-
         try:
+
             for wp in request.waypoints:
+                while self.routine_status:
+                    pass
 
                 if self._FORWARE_PRINT_WAYPOINT:
                     printlog(msg=wp, msg_type="INFO")

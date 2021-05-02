@@ -17,6 +17,7 @@ import os
 from threading import Thread, Event
 
 from std_msgs.msg import Int32
+from std_msgs.msg import Bool
 
 import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -121,7 +122,7 @@ class VisualsNode(Thread, Node):
 
         # ---------------------------------------------------------------------
         # Publishers
-
+        self.msg_routine_status = False
         # Uncomment
         # Publisher for activating the rear cam streaming
         self.msg_path_number = Int32()
@@ -132,6 +133,12 @@ class VisualsNode(Thread, Node):
             callback_group=self.callback_group,
         )
 
+        self.pub_routine_status = self.create_publisher(
+            msg_type=Bool,
+            topic="/path_planner/routine_status",
+            qos_profile=qos_profile_sensor_data,
+            callback_group=self.callback_group,
+        )
         # ---------------------------------------------------------------------
         self.damon = True
         self.run_event = Event()
@@ -482,15 +489,25 @@ class VisualsNode(Thread, Node):
                 # Key1=1048633 & Key9=1048625
                 elif key >= 48 and key <= 57:
                     printlog(
-                        msg=f"Code is no longer broken here",
-                        msg_type="WARN",
-                    )
-                    # continue  # remove this line
-                    printlog(
                         msg=f"Routine {chr(key)} was sent to path planner node",
                         msg_type="INFO",
                     )
                     self.pub_start_routine.publish(Int32(data=int(chr(key))))
+                elif key == 32:
+                    self.msg_routine_status = not self.msg_routine_status
+                    if self.msg_routine_status is True:
+                        printlog(
+                            msg=f"Routine Paused",
+                            msg_type="INFO",
+                        )
+
+                    else:
+                        printlog(
+                            msg=f"Routine Resumed",
+                            msg_type="INFO",
+                        )
+                    self.pub_routine_status.publish(Bool(data=self.msg_routine_status))
+
                 else:
                     printlog(
                         msg=f"No action for key {chr(key)} -> {key}",
