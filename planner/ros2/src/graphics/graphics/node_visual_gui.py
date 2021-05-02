@@ -329,7 +329,7 @@ class VisualsNode(Thread, Node):
             src=self._kiwibot_img,
             M=M,
             dsize=(cols, rows),
-            flags=cv2.INTER_CUBIC,  # INTER_LANCZOS4
+            flags=cv2.INTER_LANCZOS4,  # Was INTER_CUBIC
         )
 
     # TODO: Draw the robot
