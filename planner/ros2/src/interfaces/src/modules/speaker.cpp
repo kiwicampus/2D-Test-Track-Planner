@@ -89,12 +89,13 @@ void Speaker::speakerCb(const std_msgs::msg::Int8::SharedPtr msg)
 {
     /*
 +       Note: Every sound-track should be named "track#"
-        To Stop send a 0 message.
+        To Pause send a 0 message.
     */
-    m_multi_sound = 0;
+    
     snd_pcm_start(pcm_handle);
     if (msg->data > 0)
     {
+        m_multi_sound = 0;
         std::ifstream ifile;
         ifile.open(m_path + std::to_string(msg->data) + ".wav");
         if (ifile)
@@ -115,11 +116,19 @@ void Speaker::speakerCb(const std_msgs::msg::Int8::SharedPtr msg)
         ********************************************/
 
     }
-    else
+    else /*This case is to pause and resume the ambient music.*/
     {
-        RCLCPP_DEBUG(this->get_logger(), "Sound stopped");
-        m_pause = 1;
-        m_multi_sound = 1; /*Change to 0 maybe */
+        m_pause = 0;
+        if (m_multi_sound == 0)
+        {
+            RCLCPP_INFO(this->get_logger(), "Sound resumed");
+            m_multi_sound = 1;
+        }
+        else
+        {
+            RCLCPP_INFO(this->get_logger(), "Sound stopped");
+            m_multi_sound = 0;
+        }
     }
 }
 

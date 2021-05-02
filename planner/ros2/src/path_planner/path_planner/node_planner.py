@@ -25,6 +25,7 @@ from rclpy.qos import qos_profile_sensor_data
 
 from std_msgs.msg import Int32
 from std_msgs.msg import Int8
+from std_msgs.msg import Bool
 
 from utils.python_utils import printlog
 
@@ -137,6 +138,14 @@ class PlannerNode(Node):
             callback_group=self.callback_group,
         )
 
+        self.sub_routine_status = self.create_subscription(
+            msg_type=Bool,
+            topic="/path_planner/routine_status",
+            callback=self.cb_routine_status,
+            qos_profile=qos_profile_sensor_data,
+            callback_group=self.callback_group,
+        )
+
         # ---------------------------------------------------------------------
         # Publishers
 
@@ -197,6 +206,9 @@ class PlannerNode(Node):
                 msg="{}, {}, {}, {}".format(e, exc_type, fname, exc_tb.tb_lineno),
                 msg_type="ERROR",
             )
+
+    def cb_routine_status(self, msg: Bool) -> None:
+        self.pub_speaker.publish(Int8(data=0))
 
     def cb_start_routine(self, msg: Int32) -> None:
         """
