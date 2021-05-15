@@ -458,28 +458,74 @@ class PlannerNode(Node):
             n: `int` control points to discrite the trajectory
         Returns:
             way_points: `dict` coordinates and times of trajectory with trapezoidal profile
-                every element in the list is  dictionary with the keys:
-                {
-                    "idx": [int](index of the waypoint),
-                    "pt": [tuple][int](x and y axis positions in the image space),
-                    "t": [float](time for angle a),
-                    "dt": [float](sept of time for angle a, is constant element)
-                }
         """
 
         way_points = []
 
-        # ---------------------------------------------------------------------
-        # TODO: Trapezoidal speed profile
-        # Add your solution here, remeber that every element in the list is a dictionary
-        # where every element in has the next structure and data type:
-        # "idx": [int](index of the waypoint),
-        # "pt": [tuple][int](x and y axis positions in the image space),
-        # "t": [float](time for angle a),
-        # "dt": [float](sept of time for angle a, is constant element)
-        # Do not forget and respect the keys names
+        norm = np.sqrt((src[0] - dst[0]) ** 2 + (src[1] - dst[1]) ** 2)
+
+        tau = time * pt  # Time for the first segment [s]
+        Vk = norm / (time * (1 - pt))  # Max speed [ms-1]
+        a = Vk / tau  # [ms-2]
+
+        Ptau = (
+            (0.5 / norm) * a * (tau ** 2) * (dst[0] - src[0]) + src[0],
+            (0.5 / norm) * a * (tau ** 2) * (dst[1] - src[1]) + src[1],
+        )
+        Pttau = (
+            (Vk * (time - 2 * tau) / norm) * (dst[0] - src[0]) + Ptau[0],
+            (Vk * (time - 2 * tau) / norm) * (dst[1] - src[1]) + Ptau[1],
+        )
 
         # ---------------------------------------------------------------------
+        # Accelerated segment
+        k = n * pt  # Number of points
+        ptp0_norm = np.sqrt((Ptau[0] - src[0]) ** 2 + (Ptau[1] - src[1]) ** 2)
+        ptp0 = (Ptau[0] - src[0], Ptau[1] - src[1])
+        tseg1 = 2 * ptp0_norm / Vk  # Time for Accelerated segment [s]
+        a1 = Vk / tseg1  # Acceleration for Accelerated segment [m2/s]
+        times = np.linspace(0, tseg1, num=int(k))
+
+        idx = 1
+        for t in times:
+            pt = (
+                (0.5 / ptp0_norm) * a1 * (t ** 2) * ptp0[0] + src[0],
+                (0.5 / ptp0_norm) * a1 * (t ** 2) * ptp0[1] + src[1],
+            )
+            way_points.append({"idx": idx, "pt": pt, "t": t, "dt": tseg1 / k})
+            idx += 1
+
+        # ---------------------------------------------------------------------
+        # Constant segment
+        kc = n - 2 * k
+        ptaupt = (Pttau[0] - Ptau[0], Pttau[1] - Ptau[1])
+        ptaupt_norm = np.sqrt((Pttau[0] - Ptau[0]) ** 2 + (Pttau[1] - Ptau[1]) ** 2)
+        tseg2 = ptaupt_norm / Vk
+        times = np.linspace(0, tseg2, num=int(kc))
+        for t in times:
+            pt = (
+                (Vk * t / ptaupt_norm) * ptaupt[0] + Ptau[0],
+                (Vk * t / ptaupt_norm) * ptaupt[1] + Ptau[1],
+            )
+            way_points.append({"idx": idx, "pt": pt, "t": t, "dt": tseg2 / kc})
+            idx += 1
+
+        # ---------------------------------------------------------------------
+        # Decelerated segment
+        ptpdst = (dst[0] - Pttau[0], dst[1] - Pttau[1])
+        ptpdst_norm = np.sqrt((Pttau[0] - dst[0]) ** 2 + (Pttau[1] - dst[1]) ** 2)
+        tseg3 = 2.0 * ptpdst_norm / Vk
+        a3 = -Vk / tseg3
+        times = np.linspace(0, tseg3, num=int(k))
+        for t in times:
+            pt = (
+                (1 / ptpdst_norm) * (0.5 * a3 * (t ** 2) + (Vk * t)) * ptpdst[0]
+                + Pttau[0],
+                (1 / ptpdst_norm) * (0.5 * a3 * (t ** 2) + (Vk * t)) * ptpdst[1]
+                + Pttau[1],
+            )
+            way_points.append({"idx": idx, "pt": pt, "t": t, "dt": tseg3 / k})
+            idx += 1
 
         return way_points
 
@@ -493,30 +539,54 @@ class PlannerNode(Node):
             n: `int` control points to discrite the trajectory
         Returns:
             turn_points: `dict` coordinates and times of turn with trapezoidal profile
-                every element in the list is  dictionary with the keys:
-                {
-                    "idx": [int](index of the waypoint),
-                    "a": [float](yaw angle of the robot),
-                    "t": [float](time for angle a),
-                    "dt": [float](sept of time for angle a, is constant element)
-                }
         """
 
         turn_points = []
         if dst == 0.0:
             return turn_points
 
-        # ---------------------------------------------------------------------
-        # TODO: Trapezoidal turn profile
-        # Add your solution here, remeber that every element in the list is a dictionary
-        # where every element in has the next structure and data type:
-        # "idx": [int](index of the waypoint),
-        # "a": [float](yaw angle of the robot),
-        # "t": [float](time for angle a),
-        # "dt": [float](sept of time for angle a, is constant element)
-        # Do not forget and respect the keys names
+        tau = time * pt  # Time for the first segment [s]
+        Vk = dst / (time * (1 - pt))  # Max speed [ms-1]
+        a = Vk / tau  # [ms-2]
+        Ptau = 0.5 * a * (tau ** 2)
+        Pttau = Vk * (time - 2 * tau) + Ptau
 
         # ---------------------------------------------------------------------
+        # Accelerated segment
+        k = n * pt  # Number of points
+        tseg1 = 2 * Ptau / Vk  # Time for Accelerated segment [s]
+        a1 = Vk / tseg1  # Acceleration for Accelerated segment [m2/s]
+        times = np.linspace(0, tseg1, num=int(k))
+
+        idx = 1
+        for t in times:
+            ang = 0.5 * a1 * (t ** 2)
+            turn_points.append({"idx": idx, "a": ang, "t": t, "dt": tseg1 / k})
+            idx += 1
+
+        # ---------------------------------------------------------------------
+        # Constant segment
+        kc = n - 2 * k
+        ptaupt = Pttau - Ptau
+        tseg2 = ptaupt / Vk
+        times = np.linspace(0, tseg2, num=int(kc))
+        for t in times:
+            ang = (Vk * t) + Ptau
+            turn_points.append({"idx": idx, "a": ang, "t": t, "dt": tseg2 / kc})
+            idx += 1
+
+        # ---------------------------------------------------------------------
+        # Decelerated segment
+        ptpdst = dst - Pttau
+        tseg3 = 2.0 * ptpdst / Vk
+        a3 = -Vk / tseg3
+        times = np.linspace(0, tseg3, num=int(k))
+        for t in times:
+            ang = (0.5 * a3 * (t ** 2) + (Vk * t)) + Pttau
+            turn_points.append({"idx": idx, "a": ang, "t": t, "dt": tseg3 / k})
+            idx += 1
+        turn_points[-1]["a"] = float(int(turn_points[-1]["a"]))
+
         return turn_points
 
 

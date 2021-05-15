@@ -16,7 +16,7 @@ import os
 
 from threading import Thread, Event
 
-# from std_msgs.msg import Int32
+from std_msgs.msg import Int32
 
 import rclpy
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -26,6 +26,7 @@ from rclpy.logging import get_logger
 from rclpy.node import Node
 
 from utils.python_utils import printlog
+from utils.python_utils import overlay_image
 from utils.python_utils import print_list_text
 
 from usr_msgs.msg import Planner as planner_msg
@@ -81,22 +82,22 @@ class VisualsNode(Thread, Node):
         # Subscribers
 
         self.msg_planner = planner_msg()
-        # TODO: Implement the path planner status subscriber,
-        # topic name: "/path_planner/msg"
-        # message type: planner_msg
-        # callback:cb_path_planner
-        # add here your solution
+        self.sub_planner = self.create_subscription(
+            msg_type=planner_msg,
+            topic="/path_planner/msg",
+            callback=self.cb_path_planner,
+            qos_profile=qos_profile_sensor_data,
+            callback_group=self.callback_group,
+        )
 
-        # ------------------------------------------
-        # TODO: Implement the Kiwibot status subscriber,
-        # topic name: "/kiwibot/status"
-        # message type: kiwibot_msg
-        # callback:cb_kiwibot_status
-        # add here your solution
         self.msg_kiwibot = kiwibot_msg()
-
-        # ------------------------------------------
-
+        self.sub_kiwibot_stat = self.create_subscription(
+            msg_type=kiwibot_msg,
+            topic="/kiwibot/status",
+            callback=self.cb_kiwibot_status,
+            qos_profile=qos_profile_sensor_data,
+            callback_group=self.callback_group,
+        )
         self.turn_robot(heading_angle=float(os.getenv("BOT_INITIAL_YAW", default=0.0)))
         self.msg_kiwibot.pos_x = int(os.getenv("BOT_INITIAL_X", default=917))
         self.msg_kiwibot.pos_y = int(os.getenv("BOT_INITIAL_Y", default=1047))
@@ -104,15 +105,14 @@ class VisualsNode(Thread, Node):
         # ---------------------------------------------------------------------
         # Publishers
 
-        # Uncomment
         # Publisher for activating the rear cam streaming
-        # self.msg_path_number = Int32()
-        # self.pub_start_routine = self.create_publisher(
-        #     msg_type=Int32,
-        #     topic="/graphics/start_routine",
-        #     qos_profile=1,
-        #     callback_group=self.callback_group,
-        # )
+        self.msg_path_number = Int32()
+        self.pub_start_routine = self.create_publisher(
+            msg_type=Int32,
+            topic="/graphics/start_routine",
+            qos_profile=1,
+            callback_group=self.callback_group,
+        )
 
         # ---------------------------------------------------------------------
         self.damon = True
@@ -309,7 +309,6 @@ class VisualsNode(Thread, Node):
             flags=cv2.INTER_CUBIC,
         )
 
-    # TODO: Draw the robot
     def draw_robot(
         self, l_img: np.ndarray, s_img: np.ndarray, pos: tuple, transparency=1.0
     ) -> np.ndarray:
@@ -324,12 +323,13 @@ class VisualsNode(Thread, Node):
             _: Image with robot drawn
         """
 
-        # -----------------------------------------
-        # Insert you solution here
-
-        return l_img  # remove this line when implement your solution
-
-        # -----------------------------------------
+        return overlay_image(
+            l_img=l_img,
+            s_img=s_img,
+            pos=pos,
+            transparency=transparency,
+            src_center=True,
+        )
 
     def draw_map(self) -> np.ndarray:
         """
@@ -347,9 +347,9 @@ class VisualsNode(Thread, Node):
 
         # Draws robot in maps image
         # if coord[0] and coord[1]:
-        # win_img = self.draw_robot(
-        #     l_img=win_img, s_img=self._kiwibot_img, pos=robot_coord
-        # )
+        win_img = self.draw_robot(
+            l_img=win_img, s_img=self._kiwibot_img, pos=robot_coord
+        )
 
         # Draw descriptions
         str_list = [
@@ -398,7 +398,6 @@ class VisualsNode(Thread, Node):
 
         return win_img
 
-    # TODO: Drawing map descriptors
     def draw_descriptors(self, land_marks: list) -> None:
         """
             Draws maps keypoints in map image
@@ -408,11 +407,14 @@ class VisualsNode(Thread, Node):
             img_src: `cv2.math` map image with keypoints drawn
         """
 
-        # -----------------------------------------
-        # Insert you solution here
-        pass
-
-        # -----------------------------------------
+        for pt in land_marks:
+            cv2.circle(
+                img=self._win_background,
+                center=(pt.x, pt.y),
+                radius=12,
+                color=(0, 0, 255),
+                thickness=2,
+            )
 
     def run(self) -> None:
         """
@@ -452,11 +454,6 @@ class VisualsNode(Thread, Node):
                     continue
                 # Key1=1048633 & Key9=1048625
                 elif key >= 48 and key <= 57:
-                    printlog(
-                        msg=f"Code is broken here",
-                        msg_type="WARN",
-                    )
-                    continue  # remove this line
                     printlog(
                         msg=f"Routine {chr(key)} was sent to path planner node",
                         msg_type="INFO",

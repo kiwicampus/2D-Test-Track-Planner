@@ -14,27 +14,10 @@ Speaker::Speaker(rclcpp::NodeOptions &options) : Node("speaker", "interfaces", o
     auto default_qos = rclcpp::QoS(rclcpp::SystemDefaultsQoS());
 
     // /* Publisher */
-    
-    /********************************************
-    * USE THIS AMAZING PUBLISHER
-    ********************************************/
     m_done_pub = this->create_publisher<std_msgs::msg::Bool>("/device/speaker/done", default_qos);
-    /********************************************
-    * END CODE 
-    ********************************************/
 
-
-    // Subscribers
-
-   /********************************************
-    * DEFINE YOUR AMAZING SUBSCRIBER 
-    * Find Documentation here:
-    * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-subscriber-node
-   ********************************************/
-
-   /********************************************
-    * END CODE 
-   ********************************************/
+    m_speaker_sub = this->create_subscription<std_msgs::msg::Int8>("/device/speaker/command", default_qos,
+                                                                   std::bind(&Speaker::speakerCb, this, _1));
 
     /* Open the PCM device in playback mode */
     if (pcm = (snd_pcm_open(&pcm_handle, m_sound_device.c_str(), SND_PCM_STREAM_PLAYBACK, 0) < 0))
@@ -99,16 +82,13 @@ void Speaker::speakerCb(const std_msgs::msg::Int8::SharedPtr msg)
         if (ifile)
         {
             readfd = open((m_path + std::to_string(msg->data) + ".wav").c_str(), O_RDONLY);
-            status = pthread_create(&pthread_id, NULL, (THREADFUNCPTR)&Speaker::PlaySound, this);
         }
-        /********************************************
-        * PLAY A DEFAULT SOUND IF NOT FOUND THE TRACK FILE
-        ********************************************/
-        
-        /********************************************
-        * END CODE 
-        ********************************************/
-
+        else
+        {
+            readfd = open((m_path + "0.wav").c_str(), O_RDONLY);
+            RCLCPP_WARN(this->get_logger(), "No sound found");
+        }
+        status = pthread_create(&pthread_id, NULL, (THREADFUNCPTR)&Speaker::PlaySound, this);
     }
     else
     {
@@ -125,22 +105,12 @@ void *Speaker::PlaySound()
         RCLCPP_ERROR(this->get_logger(), "ERROR: .wav It's Empty");
         pthread_join(pthread_id, NULL);
     }
-
-    /********************************************
-    * PUBLISH YOUR AMAZING BOOL DATA
-    * Take Care: in order to publish a Unique Pointer you need to pass std::move(msg) 
-    * to the publish function. So you can't just pass the message inside the function, search for it :)
-    * Documentation here:
-    * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-publisher-node
-    ********************************************/
     std_msgs::msg::Bool::UniquePtr msg(new std_msgs::msg::Bool());
-
-   /********************************************
-    * END CODE 
-   ********************************************/
-
+    msg->data = false;
+    m_done_pub->publish(std::move(msg));
     while (readval = (read(readfd, buff, buff_size) > 0))
     {
+        // if (pcm = snd_pcm_writei(pcm_handle, buff, readval) == -EPIPE)
         if (pcm = snd_pcm_writei(pcm_handle, buff, frames) == -EPIPE)
         {
             snd_pcm_prepare(pcm_handle);
@@ -149,22 +119,18 @@ void *Speaker::PlaySound()
         {
             RCLCPP_ERROR(this->get_logger(), "ERROR: Writing to PCM device: %s", snd_strerror(pcm));
         }
+        if (m_pause)
+        {
+            snd_pcm_pause(pcm_handle, m_pause);
+            m_pause = 0;
+            break;
+        }
     }
     m_multi_sound = 1;
-
-           /********************************************
-    * PUBLISH YOUR AMAZING BOOL DATA
-    * Take Care: in order to publish a Unique Pointer you need to pass std::move(msg) 
-    * to the publish function. So you can't just pass the message inside the function, search for it :)
-    * Documentation here:
-    * https://docs.ros.org/en/foxy/Tutorials/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html#write-the-publisher-node
-    ********************************************/
-    // This is just for clean the variable name and re-initialize it.
     msg.reset(new std_msgs::msg::Bool());
-    
-   /********************************************
-    * END CODE 
-   ********************************************/
+    msg->data = true;
+    m_done_pub->publish(std::move(msg));
+    // snd_pcm_drain(pcm_handle);
 }
 
 void *Speaker::AmbientSound()
@@ -190,6 +156,12 @@ void *Speaker::AmbientSound()
                     else if (pcm < 0)
                     {
                         RCLCPP_ERROR(this->get_logger(), "ERROR: Writing to PCM device: %s", snd_strerror(pcm));
+                    }
+                    if (m_pause)
+                    {
+                        snd_pcm_pause(pcm_handle, m_pause);
+                        m_pause = 0;
+                        break;
                     }
                 }
             }

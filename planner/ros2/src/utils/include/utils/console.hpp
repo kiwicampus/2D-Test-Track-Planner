@@ -1,5 +1,5 @@
 /*! @package utils
-    - Utils file for the Final project
+    - Utils file for the Kronos project
     File: console.hpp
 */
 

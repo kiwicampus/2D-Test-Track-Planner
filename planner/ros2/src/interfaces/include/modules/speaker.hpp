@@ -53,7 +53,6 @@ public:
     */
     void speakerCb(const std_msgs::msg::Int8::SharedPtr _msg);
 
-
     /*!
     Thread function to play the sounds
     */
@@ -68,29 +67,13 @@ private:
     /*!
         Subscriber to trigger the Sound
     */
-
-    /********************************************
-    * USE THIS AMAZING SUBSCRIBER
-    ********************************************/
     rclcpp::Subscription<std_msgs::msg::Int8>::SharedPtr m_speaker_sub;
-
-
-
-   /********************************************
-    * END CODE 
-   ********************************************/
 
     /*!
         Publisher to ensure the sound as Done
     */
-    /********************************************
-    * DEFINE THIS AMAZING PUBLISHER
-    ********************************************/
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr m_done_pub;
 
-
-    /********************************************
-    * END CODE 
-    ********************************************/
     /*!
         Attributes
     */
